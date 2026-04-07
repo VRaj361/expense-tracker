@@ -1,10 +1,21 @@
+import { useLayoutEffect } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { useStore } from '../../store/useStore';
 
+/** Tailwind `lg` — keep desktop sidebar default; mobile drawer starts closed after login. */
+const LG_MIN_PX = 1024;
+
 export function AppLayout() {
-  const { token } = useStore();
+  const { token, setSidebarOpen } = useStore();
+
+  useLayoutEffect(() => {
+    if (!token || typeof window === 'undefined') return;
+    if (window.innerWidth < LG_MIN_PX) {
+      setSidebarOpen(false);
+    }
+  }, [token, setSidebarOpen]);
 
   if (!token) return <Navigate to="/login" replace />;
 
