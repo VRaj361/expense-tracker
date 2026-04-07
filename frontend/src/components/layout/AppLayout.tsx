@@ -2,6 +2,7 @@ import { useLayoutEffect } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { MobileBottomNav } from './MobileBottomNav';
 import { useStore } from '../../store/useStore';
 
 /** Tailwind `lg` — keep desktop sidebar default; mobile drawer starts closed after login. */
@@ -24,9 +25,10 @@ export function AppLayout() {
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:p-6 lg:pb-6">
           <Outlet />
         </main>
+        <MobileBottomNav />
       </div>
     </div>
   );

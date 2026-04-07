@@ -1,17 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { Bell, Home, Menu, Moon, Sun, Plus } from 'lucide-react';
+import { Bell, Moon, Sun, Plus, Wallet } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { useStore } from '../../store/useStore';
 import { notificationAPI } from '../../services/api';
 
 export function Header() {
-  const { user, theme, toggleTheme, setSidebarOpen, sidebarOpen } = useStore();
+  const { user, theme, toggleTheme } = useStore();
   const navigate = useNavigate();
-  const location = useLocation();
-  const isDashboard = location.pathname === '/';
   const prevCountRef = useRef<number>(0);
 
   const { data: unreadCount = 0 } = useQuery<number>({
@@ -40,29 +38,22 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-[hsl(var(--border))] bg-[hsl(var(--background))]/95 backdrop-blur supports-[backdrop-filter]:bg-[hsl(var(--background))]/60">
       <div className="flex h-full items-center justify-between px-4 md:px-6">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg hover:bg-[hsl(var(--accent))] lg:hidden cursor-pointer"
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <Link
+            to="/"
+            className="flex items-center gap-2 shrink-0 rounded-lg outline-offset-2 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[hsl(var(--ring))] lg:hidden"
+            aria-label="FinTrack home"
           >
-            <Menu className="h-5 w-5" />
-          </button>
-          {!isDashboard && (
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="p-2 rounded-lg hover:bg-[hsl(var(--accent))] lg:hidden cursor-pointer"
-              aria-label="Go to dashboard"
-            >
-              <Home className="h-5 w-5" />
-            </button>
-          )}
-          <h1 className="text-lg font-semibold hidden sm:block">
+            <Wallet className="h-7 w-7 shrink-0 text-[hsl(var(--primary))]" aria-hidden />
+            <span className="truncate text-lg font-bold tracking-tight text-[hsl(var(--foreground))]">
+              FinTrack
+            </span>
+          </Link>
+          <h1 className="hidden truncate text-lg font-semibold lg:block">
             Welcome back, {user?.name?.split(' ')[0] || 'User'}
           </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <Button size="sm" onClick={() => navigate('/expenses?add=true')} className="gap-1.5">
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Add</span>

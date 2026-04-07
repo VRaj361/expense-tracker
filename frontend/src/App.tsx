@@ -17,6 +17,7 @@ import { ReportsPage } from './pages/ReportsPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { BankImportPage } from './pages/BankImportPage';
+import { MoreMenuPage } from './pages/MoreMenuPage';
 import { useStore } from './store/useStore';
 import { authAPI } from './services/api';
 
@@ -77,6 +78,7 @@ export default function App() {
             <Route path="/bank-import" element={<BankImportPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/more" element={<MoreMenuPage />} />
           </Route>
         </Routes>
         <Toaster position="top-right" richColors closeButton />

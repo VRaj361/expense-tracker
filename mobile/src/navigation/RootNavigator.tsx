@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
@@ -6,27 +6,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useAuth } from '../hooks/useAuth';
 import { useStore } from '../store/useStore';
 import { LoginScreen } from '../screens/auth/LoginScreen';
+import { TabNavigator } from './TabNavigator';
 import { Colors } from '../theme';
 
-/** Load heavy tab stack only after login — faster first paint + smaller initial JS parse */
-const TabNavigator = React.lazy(() => import('./TabNavigator').then((m) => ({ default: m.TabNavigator })));
-
 const Stack = createNativeStackNavigator();
-
-function MainTabs() {
-  const theme = useStore((s) => s.theme);
-  return (
-    <Suspense
-      fallback={
-        <View style={[styles.loader, { backgroundColor: Colors[theme].background }]}>
-          <ActivityIndicator size="large" color={Colors[theme].primary} />
-        </View>
-      }
-    >
-      <TabNavigator />
-    </Suspense>
-  );
-}
 
 export function RootNavigator() {
   const { isAuthenticated, isReady } = useAuth();
@@ -79,7 +62,7 @@ export function RootNavigator() {
         }}
       >
         {isAuthenticated ? (
-          <Stack.Screen name="Main" component={MainTabs} />
+          <Stack.Screen name="Main" component={TabNavigator} />
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
         )}
