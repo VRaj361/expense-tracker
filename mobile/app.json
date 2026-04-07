@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "FinTrack",
+    "slug": "fintrack",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6366f1"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.fintrack.app",
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "FinTrack reaches your computer for the dev server and local API (same Wi‑Fi).",
+        "NSAppTransportSecurity": {
+          "NSAllowsLocalNetworking": true
+        }
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#6366f1"
+      },
+      "package": "com.fintrack.app"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "scheme": "fintrack",
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow FinTrack to access your camera to scan receipts."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow FinTrack to access your photos to upload receipts."
+        }
+      ],
+      "expo-asset"
+    ]
+  }
+}
