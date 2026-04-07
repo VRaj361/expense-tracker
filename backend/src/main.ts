@@ -59,8 +59,12 @@ async function bootstrap() {
   // Uploads served through authenticated endpoint, not public static
   // app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads' });
 
-  const port = process.env.PORT || 3000;
+  const port = Number(process.env.PORT) || 3000;
   await app.listen(port, '0.0.0.0');
-  console.log(`Server running on http://0.0.0.0:${port}`);
+  console.log(`Server listening on 0.0.0.0:${port} (PORT=${process.env.PORT ?? 'default'})`);
 }
-bootstrap();
+
+bootstrap().catch((err) => {
+  console.error('Bootstrap failed:', err);
+  process.exit(1);
+});

@@ -26,9 +26,20 @@ import { BankImportModule } from './modules/bank-import/bank-import.module';
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => {
         const configuredUri = config.get('MONGODB_URI');
+        const isProd = process.env.NODE_ENV === 'production';
+
         if (configuredUri && configuredUri !== 'memory') {
           return { uri: configuredUri };
         }
+
+        // Render (and similar) will time out on port binding if we try to download/start
+        // mongodb-memory-server here — it can take minutes or fail in a read-only/slim image.
+        if (isProd) {
+          throw new Error(
+            'Set MONGODB_URI to your MongoDB Atlas connection string in production (Render dashboard → Environment). Do not use "memory".',
+          );
+        }
+
         const { MongoMemoryServer } = await import('mongodb-memory-server');
         const mongod = await MongoMemoryServer.create();
         const uri = mongod.getUri();

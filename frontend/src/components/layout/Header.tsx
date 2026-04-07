@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { Bell, Menu, Moon, Sun, Plus } from 'lucide-react';
+import { Bell, Home, Menu, Moon, Sun, Plus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { useStore } from '../../store/useStore';
@@ -10,6 +10,8 @@ import { notificationAPI } from '../../services/api';
 export function Header() {
   const { user, theme, toggleTheme, setSidebarOpen, sidebarOpen } = useStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isDashboard = location.pathname === '/';
   const prevCountRef = useRef<number>(0);
 
   const { data: unreadCount = 0 } = useQuery<number>({
@@ -40,11 +42,22 @@ export function Header() {
       <div className="flex h-full items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-lg hover:bg-[hsl(var(--accent))] lg:hidden cursor-pointer"
           >
             <Menu className="h-5 w-5" />
           </button>
+          {!isDashboard && (
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="p-2 rounded-lg hover:bg-[hsl(var(--accent))] lg:hidden cursor-pointer"
+              aria-label="Go to dashboard"
+            >
+              <Home className="h-5 w-5" />
+            </button>
+          )}
           <h1 className="text-lg font-semibold hidden sm:block">
             Welcome back, {user?.name?.split(' ')[0] || 'User'}
           </h1>
