@@ -3,7 +3,7 @@ import {
   Receipt,
   PiggyBank,
   LayoutDashboard,
-  FileDown,
+  UsersRound,
   LayoutGrid,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
@@ -12,12 +12,13 @@ const TABS = [
   { to: '/expenses', label: 'Transactions', icon: Receipt, end: false },
   { to: '/budgets', label: 'Budgets', icon: PiggyBank, end: false },
   { to: '/', label: 'Home', icon: LayoutDashboard, end: true },
-  { to: '/reports', label: 'Reports', icon: FileDown, end: false },
+  { to: '/shared-wallets', label: 'Shared', icon: UsersRound, end: false },
   { to: '/more', label: 'Others', icon: LayoutGrid, end: false },
 ] as const;
 
 const OTHERS_PREFIXES = [
   '/more',
+  '/reports',
   '/recurring',
   '/reminders',
   '/loans',
@@ -47,13 +48,16 @@ export function MobileBottomNav() {
       <div className="mx-auto flex max-w-lg items-stretch justify-around px-1">
         {TABS.map(({ to, label, icon: Icon, end }) => {
           const othersTab = to === '/more';
+          const sharedTab = to === '/shared-wallets';
+          const isSharedActive =
+            pathname === '/shared-wallets' || pathname.startsWith('/shared-wallets/');
           return (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) => {
-                const active = othersTab ? isOthersActive(pathname) : isActive;
+                const active = sharedTab ? isSharedActive : othersTab ? isOthersActive(pathname) : isActive;
                 return cn(
                   'flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-1.5 px-0.5 transition-colors',
                   active
@@ -63,7 +67,7 @@ export function MobileBottomNav() {
               }}
             >
               {({ isActive }) => {
-                const active = othersTab ? isOthersActive(pathname) : isActive;
+                const active = sharedTab ? isSharedActive : othersTab ? isOthersActive(pathname) : isActive;
                 return (
                   <>
                     <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />

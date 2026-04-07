@@ -176,3 +176,46 @@ export const bankImportAPI = {
     });
   },
 };
+
+export const sharedWalletAPI = {
+  previewInvite: (token: string) => api.get('/shared-wallets/invites/preview', { params: { token } }),
+  create: (data: { name: string; description?: string; currency?: string }) => api.post('/shared-wallets', data),
+  list: () => api.get('/shared-wallets'),
+  acceptInvite: (token: string) => api.post('/shared-wallets/invites/accept', { token }),
+  detail: (walletId: string) => api.get(`/shared-wallets/${walletId}`),
+  invite: (walletId: string, data: { email: string; role: 'editor' | 'viewer' }) =>
+    api.post(`/shared-wallets/${walletId}/invite`, data),
+  updateMemberRole: (walletId: string, memberId: string, role: 'editor' | 'viewer') =>
+    api.patch(`/shared-wallets/${walletId}/members/${memberId}/role`, { role }),
+  updateMemberDisplayName: (walletId: string, memberId: string, displayName: string) =>
+    api.patch(`/shared-wallets/${walletId}/members/${memberId}/name`, { displayName }),
+  removeMember: (walletId: string, memberId: string) =>
+    api.delete(`/shared-wallets/${walletId}/members/${memberId}`),
+  entries: (walletId: string) => api.get(`/shared-wallets/${walletId}/entries`),
+  addEntry: (walletId: string, data: Record<string, unknown>) => api.post(`/shared-wallets/${walletId}/entries`, data),
+  summary: (walletId: string) => api.get(`/shared-wallets/${walletId}/summary`),
+  report: (walletId: string) => api.get(`/shared-wallets/${walletId}/report`),
+  balances: async (walletId: string) => {
+    try {
+      return await api.get(`/shared-wallets/${walletId}/balances`);
+    } catch {
+      return await api.get(`/shared-wallets/${walletId}/settlement-balances`);
+    }
+  },
+  reportPdf: async (walletId: string) => {
+    const paths = [`/shared-wallets/${walletId}/report/pdf`, `/shared-wallets/${walletId}/download-report`];
+    let last: unknown;
+    for (const p of paths) {
+      try {
+        return await api.get(p, { responseType: 'blob' });
+      } catch (e) {
+        last = e;
+      }
+    }
+    throw last;
+  },
+  settlementHints: (walletId: string) => api.get(`/shared-wallets/${walletId}/settlement-hints`),
+  settlements: (walletId: string) => api.get(`/shared-wallets/${walletId}/settlements`),
+  addSettlement: (walletId: string, data: Record<string, unknown>) =>
+    api.post(`/shared-wallets/${walletId}/settlements`, data),
+};

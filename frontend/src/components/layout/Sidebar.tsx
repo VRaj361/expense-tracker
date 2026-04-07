@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Receipt, PiggyBank, RefreshCw, Bell, CreditCard,
-  TrendingUp, Settings, Wallet, Bot, FileDown, Upload, ChevronLeft,
+  TrendingUp, Settings, Wallet, Bot, FileDown, Upload, ChevronLeft, UsersRound,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useStore } from '../../store/useStore';
@@ -9,6 +9,7 @@ import { useStore } from '../../store/useStore';
 const NAV_ITEMS = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/expenses', icon: Receipt, label: 'Transactions' },
+  { path: '/shared-wallets', icon: UsersRound, label: 'Shared wallets' },
   { path: '/budgets', icon: PiggyBank, label: 'Budgets' },
   { path: '/recurring', icon: RefreshCw, label: 'Recurring' },
   { path: '/reminders', icon: Bell, label: 'Reminders' },

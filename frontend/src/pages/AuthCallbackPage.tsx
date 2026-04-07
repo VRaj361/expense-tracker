@@ -15,7 +15,13 @@ export function AuthCallbackPage() {
       setTokens(token, refreshToken);
       authAPI.getMe().then((res) => {
         setUser(res.data);
-        navigate('/', { replace: true });
+        const next = sessionStorage.getItem('postLoginRedirect');
+        sessionStorage.removeItem('postLoginRedirect');
+        if (next && next.startsWith('/')) {
+          navigate(next, { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
       }).catch(() => navigate('/login', { replace: true }));
     } else {
       navigate('/login', { replace: true });

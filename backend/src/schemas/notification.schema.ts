@@ -14,7 +14,18 @@ export class Notification {
   @Prop({ required: true })
   message: string;
 
-  @Prop({ required: true, enum: ['budget_alert', 'bill_reminder', 'emi_reminder', 'report', 'system', 'automation'] })
+  @Prop({
+    required: true,
+    enum: [
+      'budget_alert',
+      'bill_reminder',
+      'emi_reminder',
+      'report',
+      'system',
+      'automation',
+      'shared_wallet',
+    ],
+  })
   type: string;
 
   @Prop({ default: false })

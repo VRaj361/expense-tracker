@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useVisiblePollInterval } from '../../hooks/useVisiblePollInterval';
 import { Bell, Moon, Sun, Plus, Wallet } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,11 +12,13 @@ export function Header() {
   const { user, theme, toggleTheme } = useStore();
   const navigate = useNavigate();
   const prevCountRef = useRef<number>(0);
+  const notificationPollMs = useVisiblePollInterval(120_000);
 
   const { data: unreadCount = 0 } = useQuery<number>({
     queryKey: ['notifications-count'],
     queryFn: () => notificationAPI.getUnreadCount().then((r) => r.data),
-    refetchInterval: 10000,
+    refetchInterval: notificationPollMs,
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {

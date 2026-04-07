@@ -18,6 +18,9 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { BankImportPage } from './pages/BankImportPage';
 import { MoreMenuPage } from './pages/MoreMenuPage';
+import { SharedWalletsPage } from './pages/SharedWalletsPage';
+import { SharedWalletDetailPage } from './pages/SharedWalletDetailPage';
+import { SharedWalletJoinPage } from './pages/SharedWalletJoinPage';
 import { useStore } from './store/useStore';
 import { authAPI } from './services/api';
 
@@ -65,6 +68,7 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route path="/shared-wallets/join" element={<SharedWalletJoinPage />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/expenses" element={<ExpensesPage />} />
@@ -79,6 +83,8 @@ export default function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/more" element={<MoreMenuPage />} />
+            <Route path="/shared-wallets" element={<SharedWalletsPage />} />
+            <Route path="/shared-wallets/:walletId" element={<SharedWalletDetailPage />} />
           </Route>
         </Routes>
         <Toaster position="top-right" richColors closeButton />

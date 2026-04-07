@@ -9,6 +9,7 @@ import {
   Inbox,
   Settings,
   ChevronRight,
+  FileDown,
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -19,6 +20,13 @@ const ITEMS: {
   icon: typeof RefreshCw;
   color: string;
 }[] = [
+  {
+    to: '/reports',
+    label: 'Reports',
+    description: 'Export and download expense reports',
+    icon: FileDown,
+    color: 'text-violet-600 dark:text-violet-400',
+  },
   {
     to: '/recurring',
     label: 'Recurring',

@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
@@ -18,6 +18,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ExportsModule } from './modules/exports/exports.module';
 import { AutomationModule } from './modules/automation/automation.module';
 import { BankImportModule } from './modules/bank-import/bank-import.module';
+import { SharedWalletsModule } from './modules/shared-wallets/shared-wallets.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { BankImportModule } from './modules/bank-import/bank-import.module';
     ExportsModule,
     AutomationModule,
     BankImportModule,
+    SharedWalletsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },

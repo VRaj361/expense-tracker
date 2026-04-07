@@ -209,3 +209,72 @@ export interface ParsedTransaction {
   type: 'expense' | 'income';
   amount: number;
 }
+
+/** Shared wallets (group expenses — separate from personal FinTrack transactions) */
+export interface SharedWallet {
+  _id: string;
+  ownerId: string;
+  name: string;
+  description?: string;
+  currency: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface SharedWalletMemberRow {
+  _id: string;
+  walletId: string;
+  userId?: { _id: string; name: string; email: string; avatar?: string };
+  email: string;
+  role: 'owner' | 'editor' | 'viewer';
+  status: 'pending' | 'active' | 'removed';
+  invitedBy?: string;
+  /** Wallet-only label; owner can set. UI falls back to userId.name. */
+  displayName?: string;
+}
+
+export interface SharedWalletEntryRow {
+  _id: string;
+  walletId: string;
+  amount: number;
+  category?: string;
+  description?: string;
+  spentAt: string;
+  type: 'expense' | 'income';
+  createdByUserId?: { _id: string; name: string; email: string; avatar?: string };
+  onBehalfOfUserId?: { _id: string; name: string; email: string; avatar?: string };
+}
+
+export interface SharedWalletSummary {
+  currency: string;
+  expenseTotal: number;
+  entryCount: number;
+  byUser: { userId: string; name: string; total: number; count: number }[];
+  highestSpender: { userId: string; name: string; total: number; count: number } | null;
+  lowestSpender: { userId: string; name: string; total: number; count: number } | null;
+}
+
+export interface SharedWalletBalanceMember {
+  userId: string;
+  name: string;
+  attributedSpend: number;
+  fairShare: number;
+  netBeforeSettlements: number;
+  netAfterSettlements: number;
+}
+
+export interface SharedWalletSuggestedTransfer {
+  fromUserId: string;
+  fromName: string;
+  toUserId: string;
+  toName: string;
+  amount: number;
+}
+
+export interface SharedWalletBalances {
+  currency: string;
+  fairSharePerMember: number;
+  members: SharedWalletBalanceMember[];
+  suggestedTransfers: SharedWalletSuggestedTransfer[];
+}
