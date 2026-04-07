@@ -244,13 +244,13 @@ export function LoansPage() {
                 {errors.tenure && <p className="text-xs text-[hsl(var(--destructive))] mt-1">{errors.tenure.message}</p>}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
+              <div className="min-w-0">
                 <label className="text-sm font-medium mb-1.5 block">Start Date</label>
                 <Input type="date" {...register('startDate')} />
                 {errors.startDate && <p className="text-xs text-[hsl(var(--destructive))] mt-1">{errors.startDate.message}</p>}
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="text-sm font-medium mb-1.5 block">EMI Deduction Day *</label>
                 <Input type="number" min={1} max={28} placeholder="5" {...register('emiDay', { valueAsNumber: true })} />
                 {errors.emiDay && <p className="text-xs text-[hsl(var(--destructive))] mt-1">{errors.emiDay.message}</p>}

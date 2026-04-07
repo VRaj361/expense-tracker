@@ -46,12 +46,12 @@ export function ReportsPage() {
       <Card>
         <CardHeader><CardTitle className="text-base">Date Range</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
+            <div className="min-w-0">
               <label className="text-sm font-medium mb-1.5 block">Start Date</label>
               <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="text-sm font-medium mb-1.5 block">End Date</label>
               <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </div>

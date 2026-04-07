@@ -154,13 +154,13 @@ export function RemindersPage() {
               <label className="text-sm font-medium mb-1.5 block">Description</label>
               <Textarea placeholder="Any additional details (optional)" {...register('description')} rows={2} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
+              <div className="min-w-0">
                 <label className="text-sm font-medium mb-1.5 block">Amount *</label>
                 <Input type="number" placeholder="1500" {...register('amount', { valueAsNumber: true })} />
                 {errors.amount && <p className="text-xs text-[hsl(var(--destructive))] mt-1">{errors.amount.message}</p>}
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="text-sm font-medium mb-1.5 block">Due Date *</label>
                 <Input type="date" {...register('dueDate')} />
                 {errors.dueDate && <p className="text-xs text-[hsl(var(--destructive))] mt-1">{errors.dueDate.message}</p>}

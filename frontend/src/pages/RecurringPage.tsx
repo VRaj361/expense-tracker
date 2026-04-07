@@ -138,15 +138,15 @@ export function RecurringPage() {
               <label className="text-sm font-medium mb-1.5 block">Description</label>
               <Input placeholder="e.g. Netflix, Rent, Salary" {...register('description')} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
+              <div className="min-w-0">
                 <label className="text-sm font-medium mb-1.5 block">Frequency</label>
                 <Select
                   options={[{ value: 'daily', label: 'Daily' }, { value: 'weekly', label: 'Weekly' }, { value: 'monthly', label: 'Monthly' }, { value: 'yearly', label: 'Yearly' }]}
                   {...register('frequency')}
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="text-sm font-medium mb-1.5 block">Next Due Date</label>
                 <Input type="date" {...register('nextDueDate')} />
                 {errors.nextDueDate && <p className="text-xs text-[hsl(var(--destructive))] mt-1">{errors.nextDueDate.message}</p>}

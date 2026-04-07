@@ -450,8 +450,8 @@ export function ExpensesPage() {
               {errors.amount && <p className="text-xs text-[hsl(var(--destructive))] mt-1">{errors.amount.message}</p>}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
+              <div className="min-w-0">
                 <label className="text-sm font-medium mb-1.5 block">Category</label>
                 <Select
                   options={filteredCategories.map(c => ({ value: c.name, label: c.name }))}
@@ -459,7 +459,7 @@ export function ExpensesPage() {
                   {...register('categoryName')}
                 />
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="text-sm font-medium mb-1.5 block">Date *</label>
                 <Input type="date" {...register('date')} />
                 {errors.date && <p className="text-xs text-[hsl(var(--destructive))] mt-1">{errors.date.message}</p>}
