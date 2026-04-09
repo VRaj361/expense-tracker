@@ -123,20 +123,29 @@ export function SettingsPage() {
           </div>
           <div className="space-y-2">
             {(categories as Category[]).map((c) => (
-              <div key={c._id} className="flex items-center justify-between p-2 rounded-lg hover:bg-[hsl(var(--accent))]">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: c.color }} />
-                  <span className="text-sm">{c.name}</span>
-                  <span className="text-xs text-[hsl(var(--muted-foreground))]">({c.type})</span>
+              <div
+                key={c._id}
+                className="flex items-center gap-2 min-w-0 p-2 rounded-lg hover:bg-[hsl(var(--accent))]"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                  <div
+                    className="h-3 w-3 shrink-0 rounded-full"
+                    style={{ backgroundColor: c.color }}
+                  />
+                  <span className="min-w-0 truncate text-sm">{c.name}</span>
+                  <span className="shrink-0 text-xs text-[hsl(var(--muted-foreground))]">
+                    ({c.type})
+                  </span>
                 </div>
                 <button
                   type="button"
                   title="Remove category"
+                  aria-label={`Remove category ${c.name}`}
                   onClick={() => setCategoryToDelete(c)}
                   disabled={deleteCategory.isPending}
-                  className="p-1.5 rounded-md cursor-pointer text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive))]/10 disabled:opacity-50"
+                  className="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive))]/10 disabled:opacity-50 sm:h-9 sm:w-9"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-5 w-5 sm:h-4 sm:w-4" />
                 </button>
               </div>
             ))}

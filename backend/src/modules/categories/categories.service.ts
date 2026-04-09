@@ -9,6 +9,7 @@ import { Budget, BudgetDocument } from '../../schemas/budget.schema';
 import { RecurringExpense, RecurringExpenseDocument } from '../../schemas/recurring-expense.schema';
 import { VendorMapping, VendorMappingDocument } from '../../schemas/vendor-mapping.schema';
 import {
+  CATEGORY_SEED_FIELD_SYNC_KEY,
   DEFAULT_CATEGORY_SEEDS,
   DEFAULT_CATEGORIES_MIGRATION_KEY,
   FALLBACK_CATEGORY_NAME,
@@ -50,24 +51,65 @@ export class CategoriesService implements OnModuleInit {
     return this.ensureDefaultsForUser(userId);
   }
 
-  async onModuleInit() {
-    const key = DEFAULT_CATEGORIES_MIGRATION_KEY;
-    try {
-      const done = await this.appMigrationModel.findOne({ key }).lean();
-      if (done) return;
-
-      const users = await this.userModel.find().select('_id').lean();
-      let totalInserted = 0;
-      for (const u of users) {
-        const n = await this.ensureDefaultsForUser(u._id.toString());
-        totalInserted += n;
-      }
-      await this.appMigrationModel.create({ key });
-      this.logger.log(
-        `Default categories migration "${key}": ${users.length} user(s), ${totalInserted} new category row(s) inserted`,
+  /**
+   * Updates existing user categories whose name matches a seed to the current seed’s
+   * icon, color, type, and isDefault. Does not change _id (safe for expense FKs).
+   */
+  async syncDefaultCategoryFieldsFromSeedForUser(userId: string): Promise<number> {
+    const uid = new Types.ObjectId(userId);
+    let modified = 0;
+    for (const seed of DEFAULT_CATEGORY_SEEDS) {
+      const res = await this.categoryModel.updateOne(
+        { userId: uid, name: seed.name },
+        {
+          $set: {
+            icon: seed.icon,
+            color: seed.color,
+            type: seed.type,
+            isDefault: seed.isDefault,
+          },
+        },
       );
+      if (res.modifiedCount > 0) modified += 1;
+    }
+    return modified;
+  }
+
+  async onModuleInit() {
+    try {
+      const insertKey = DEFAULT_CATEGORIES_MIGRATION_KEY;
+      const insertDone = await this.appMigrationModel.findOne({ key: insertKey }).lean();
+      if (!insertDone) {
+        const users = await this.userModel.find().select('_id').lean();
+        let totalInserted = 0;
+        for (const u of users) {
+          const n = await this.ensureDefaultsForUser(u._id.toString());
+          totalInserted += n;
+        }
+        await this.appMigrationModel.create({ key: insertKey });
+        this.logger.log(
+          `Default categories migration "${insertKey}": ${users.length} user(s), ${totalInserted} new category row(s) inserted`,
+        );
+      }
+
+      const syncKey = CATEGORY_SEED_FIELD_SYNC_KEY;
+      const syncDone = await this.appMigrationModel.findOne({ key: syncKey }).lean();
+      if (!syncDone) {
+        const users = await this.userModel.find().select('_id').lean();
+        let rowsUpdated = 0;
+        let insertedAfterSync = 0;
+        for (const u of users) {
+          const uid = u._id.toString();
+          rowsUpdated += await this.syncDefaultCategoryFieldsFromSeedForUser(uid);
+          insertedAfterSync += await this.ensureDefaultsForUser(uid);
+        }
+        await this.appMigrationModel.create({ key: syncKey });
+        this.logger.log(
+          `Category seed field sync "${syncKey}": ${users.length} user(s), ${rowsUpdated} row(s) updated, ${insertedAfterSync} new row(s) inserted`,
+        );
+      }
     } catch (err) {
-      this.logger.error(`Default categories migration failed: ${(err as Error).message}`);
+      this.logger.error(`Category migrations failed: ${(err as Error).message}`);
     }
   }
 

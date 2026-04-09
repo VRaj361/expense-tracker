@@ -45,5 +45,12 @@ export const DEFAULT_CATEGORY_SEEDS: DefaultCategorySeed[] = [
 /** Transactions and rules are moved here when their category is deleted. */
 export const FALLBACK_CATEGORY_NAME = 'Other';
 
-/** Bump this when DEFAULT_CATEGORY_SEEDS changes so OnModuleInit migration runs again. */
+/** Bump when you add/remove seed rows so missing names are inserted for all users. */
 export const DEFAULT_CATEGORIES_MIGRATION_KEY = 'category-defaults-daily-v2';
+
+/**
+ * One-time sync: for users who already have every seed name, still update icon/color/type/isDefault
+ * from the current seed list (IDs unchanged so expenses stay linked).
+ * Bump when seed field values change and you want existing rows updated on deploy.
+ */
+export const CATEGORY_SEED_FIELD_SYNC_KEY = 'category-seed-field-sync-v1';
