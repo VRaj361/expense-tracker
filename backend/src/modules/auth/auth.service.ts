@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../../schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private categoriesService: CategoriesService,
   ) {}
 
   async validateGoogleUser(profile: any): Promise<UserDocument> {
@@ -23,6 +25,7 @@ export class AuthService {
         name: displayName,
         avatar: photos?.[0]?.value || '',
       });
+      await this.categoriesService.ensureDefaultsForUser(user._id.toString());
     }
     return user;
   }

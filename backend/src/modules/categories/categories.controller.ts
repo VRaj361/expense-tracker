@@ -7,8 +7,10 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
-  findAll(@CurrentUser() user: any) {
-    return this.categoriesService.findByUser(user._id.toString());
+  async findAll(@CurrentUser() user: any) {
+    const uid = user._id.toString();
+    await this.categoriesService.ensureDefaultsIfEmpty(uid);
+    return this.categoriesService.findByUser(uid);
   }
 
   @Post()

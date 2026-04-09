@@ -1,7 +1,15 @@
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useStore } from '../store/useStore';
@@ -15,6 +23,7 @@ export function SettingsPage() {
   const { user, setUser, logout } = useStore();
   const queryClient = useQueryClient();
   const [newCat, setNewCat] = useState({ name: '', color: '#6366f1', type: 'expense' });
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   const { register, handleSubmit } = useForm({
     defaultValues: { phone: user?.phone || '', currency: user?.currency || 'INR' },
@@ -41,7 +50,19 @@ export function SettingsPage() {
 
   const deleteCategory = useMutation({
     mutationFn: (id: string) => categoryAPI.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
+    onSuccess: () => {
+      setCategoryToDelete(null);
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['recurring'] });
+      queryClient.invalidateQueries({ queryKey: ['automation-rules'] });
+      toast.success('Category removed. Linked transactions use “Other”.');
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message || err?.message || 'Could not remove category';
+      toast.error(Array.isArray(msg) ? msg.join(', ') : msg);
+    },
   });
 
   return (
@@ -69,7 +90,12 @@ export function SettingsPage() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Custom Categories</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Categories</CardTitle>
+          <CardDescription>
+            Add your own or remove any category (including defaults). Transactions stay in your history; anything that used a removed category is moved to <strong>Other</strong>.
+          </CardDescription>
+        </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
             <Input
@@ -103,11 +129,15 @@ export function SettingsPage() {
                   <span className="text-sm">{c.name}</span>
                   <span className="text-xs text-[hsl(var(--muted-foreground))]">({c.type})</span>
                 </div>
-                {!c.isDefault && (
-                  <button onClick={() => deleteCategory.mutate(c._id)} className="p-1 cursor-pointer text-[hsl(var(--destructive))]">
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  title="Remove category"
+                  onClick={() => setCategoryToDelete(c)}
+                  disabled={deleteCategory.isPending}
+                  className="p-1.5 rounded-md cursor-pointer text-[hsl(var(--destructive))] hover:bg-[hsl(var(--destructive))]/10 disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             ))}
           </div>
@@ -119,6 +149,40 @@ export function SettingsPage() {
           <Button variant="destructive" onClick={logout}>Sign Out</Button>
         </CardContent>
       </Card>
+
+      <Dialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Remove category?</DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-3 text-sm text-[hsl(var(--muted-foreground))]">
+                <p>
+                  <span className="font-medium text-[hsl(var(--foreground))]">{categoryToDelete?.name}</span> will be
+                  removed from your list.
+                </p>
+                <p>
+                  Transactions, budgets, recurring items, and automation rules that use this category will be reassigned
+                  to <span className="font-medium text-[hsl(var(--foreground))]">Other</span>. Nothing is deleted from
+                  your ledger.
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button type="button" variant="outline" onClick={() => setCategoryToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteCategory.isPending}
+              onClick={() => categoryToDelete && deleteCategory.mutate(categoryToDelete._id)}
+            >
+              {deleteCategory.isPending ? 'Removing…' : 'Remove category'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

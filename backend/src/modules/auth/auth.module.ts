@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { User, UserSchema } from '../../schemas/user.schema';
+import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { User, UserSchema } from '../../schemas/user.schema';
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    CategoriesModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, GoogleStrategy, JwtStrategy],
