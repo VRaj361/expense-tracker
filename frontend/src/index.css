@@ -59,14 +59,34 @@ html:not(.dark) {
   color-scheme: light;
 }
 
-/* Chrome / Safari / Edge: date/time inputs use a dark calendar/clock glyph by default */
+/* Native date/time pickers: default glyphs are dark; lighten in dark mode.
+   Use invert(100%) (not invert(1)) so minifiers don't emit bare invert(), which is ignored in some engines. */
+html.dark input[type='date']::-webkit-calendar-picker-indicator,
+html.dark input[type='datetime-local']::-webkit-calendar-picker-indicator,
+html.dark input[type='month']::-webkit-calendar-picker-indicator,
+html.dark input[type='time']::-webkit-calendar-picker-indicator,
 .dark input[type='date']::-webkit-calendar-picker-indicator,
 .dark input[type='datetime-local']::-webkit-calendar-picker-indicator,
 .dark input[type='month']::-webkit-calendar-picker-indicator,
 .dark input[type='time']::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.9;
+  opacity: 1;
   cursor: pointer;
+  /* Force neutral glyph then invert = reliable light icon on Chromium */
+  filter: brightness(0) invert(100%);
+}
+
+/* Firefox */
+html.dark input[type='date']::-moz-calendar-picker-indicator,
+html.dark input[type='datetime-local']::-moz-calendar-picker-indicator,
+html.dark input[type='month']::-moz-calendar-picker-indicator,
+html.dark input[type='time']::-moz-calendar-picker-indicator,
+.dark input[type='date']::-moz-calendar-picker-indicator,
+.dark input[type='datetime-local']::-moz-calendar-picker-indicator,
+.dark input[type='month']::-moz-calendar-picker-indicator,
+.dark input[type='time']::-moz-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  filter: brightness(0) invert(100%);
 }
 
 * {
