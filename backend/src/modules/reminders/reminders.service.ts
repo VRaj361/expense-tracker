@@ -6,12 +6,13 @@ import { Reminder, ReminderDocument } from '../../schemas/reminder.schema';
 import { Notification, NotificationDocument } from '../../schemas/notification.schema';
 import { User, UserDocument } from '../../schemas/user.schema';
 import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { sanitizeHtml } from '../../common/utils/sanitize';
 
 @Injectable()
 export class RemindersService {
   private readonly logger = new Logger(RemindersService.name);
-
+  private readonly resend = new Resend(process.env.RESEND_API_KEY);
   constructor(
     @InjectModel(Reminder.name) private reminderModel: Model<ReminderDocument>,
     @InjectModel(Notification.name) private notificationModel: Model<NotificationDocument>,
@@ -84,21 +85,31 @@ export class RemindersService {
 
   private async sendEmailReminder(email: string, reminder: ReminderDocument) {
     try {
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: Number(process.env.SMTP_PORT) || 587,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
+      // const transporter = nodemailer.createTransport({
+      //   host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      //   port: Number(process.env.SMTP_PORT) || 587,
+      //   auth: {
+      //     user: process.env.SMTP_USER,
+      //     pass: process.env.SMTP_PASS,
+      //   },
+      // });
 
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'ExpenseTracker <noreply@expensetracker.com>',
-        to: email,
+      // await transporter.sendMail({
+      //   from: process.env.SMTP_FROM || 'ExpenseTracker <noreply@expensetracker.com>',
+      //   to: email,
+      //   subject: `Reminder: ${sanitizeHtml(reminder.title)}`,
+      //   html: `<div style="font-family:sans-serif;padding:20px"><h2>Bill Reminder</h2><p><strong>${sanitizeHtml(reminder.title)}</strong> of <strong>Rs. ${reminder.amount}</strong> is due on <strong>${reminder.dueDate.toLocaleDateString()}</strong>.</p><p>${sanitizeHtml(reminder.description || '')}</p></div>`,
+      // });
+
+      const { data, error } = await this.resend.emails.send({
+        from: 'FinTrack <noreply@fintrack.app>',
+        to: [email],
         subject: `Reminder: ${sanitizeHtml(reminder.title)}`,
         html: `<div style="font-family:sans-serif;padding:20px"><h2>Bill Reminder</h2><p><strong>${sanitizeHtml(reminder.title)}</strong> of <strong>Rs. ${reminder.amount}</strong> is due on <strong>${reminder.dueDate.toLocaleDateString()}</strong>.</p><p>${sanitizeHtml(reminder.description || '')}</p></div>`,
       });
+      if (error) {
+        this.logger.error(`Reminder email failed: ${error}`);
+      }
     } catch (error) {
       this.logger.error('Email send failed:', error.message);
     }

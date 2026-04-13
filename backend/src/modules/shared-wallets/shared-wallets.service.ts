@@ -8,7 +8,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { createHash, randomBytes } from 'crypto';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { SharedWallet, SharedWalletDocument } from '../../schemas/shared-wallet.schema';
 import { SharedWalletMember, SharedWalletMemberDocument } from '../../schemas/shared-wallet-member.schema';
 import { SharedWalletEntry, SharedWalletEntryDocument } from '../../schemas/shared-wallet-entry.schema';
@@ -43,6 +43,7 @@ function generateInviteToken(): string {
 @Injectable()
 export class SharedWalletsService {
   private readonly logger = new Logger(SharedWalletsService.name);
+  private readonly resend = new Resend(process.env.RESEND_API_KEY);
 
   constructor(
     @InjectModel(SharedWallet.name) private walletModel: Model<SharedWalletDocument>,
@@ -57,37 +58,59 @@ export class SharedWalletsService {
     return (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
   }
 
+  // Comment nodemailer service because not working in free service
+  // private async sendInviteEmail(to: string, walletName: string, inviteUrl: string): Promise<boolean> {
+  //   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  //     this.logger.warn(`SMTP not configured; invite link for ${to}: ${inviteUrl}`);
+  //     return false;
+  //   }
+  //   try {
+  //     const transporter = nodemailer.createTransport({
+  //       host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  //       port: Number(process.env.SMTP_PORT) || 587,
+  //       auth: {
+  //         user: process.env.SMTP_USER,
+  //         pass: process.env.SMTP_PASS,
+  //       },
+  //     });
+  //     await transporter.sendMail({
+  //       from: process.env.SMTP_FROM || 'FinTrack <noreply@fintrack.app>',
+  //       to,
+  //       subject: `You're invited to shared wallet: ${sanitizeHtml(walletName)}`,
+  //       html: `<div style="font-family:system-ui,sans-serif;padding:24px;max-width:560px">
+  //         <h2 style="margin:0 0 12px">Shared wallet invite</h2>
+  //         <p>You've been invited to <strong>${sanitizeHtml(walletName)}</strong> on FinTrack.</p>
+  //         <p><a href="${inviteUrl}" style="display:inline-block;padding:12px 20px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Accept invite</a></p>
+  //         <p style="color:#64748b;font-size:13px">Or copy this link:<br/><span style="word-break:break-all">${inviteUrl}</span></p>
+  //         <p style="color:#64748b;font-size:12px">Sign in with the same Google account as this email. Link expires in 7 days.</p>
+  //       </div>`,
+  //     });
+  //     return true;
+  //   } catch (e) {
+  //     this.logger.error(`Invite email failed: ${e}`);
+  //     return false;
+  //   }
+  // }
+
   private async sendInviteEmail(to: string, walletName: string, inviteUrl: string): Promise<boolean> {
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      this.logger.warn(`SMTP not configured; invite link for ${to}: ${inviteUrl}`);
+    const { data, error } = await this.resend.emails.send({
+      from: 'FinTrack <onboarding@resend.dev>',
+      to: [to],
+      subject: `You're invited to shared wallet: ${sanitizeHtml(walletName)}`,
+      html: `<div style="font-family:system-ui,sans-serif;padding:24px;max-width:560px">
+        <h2 style="margin:0 0 12px">Shared wallet invite</h2>
+        <p>You've been invited to <strong>${sanitizeHtml(walletName)}</strong> on FinTrack.</p>
+        <p><a href="${inviteUrl}" style="display:inline-block;padding:12px 20px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Accept invite</a></p>
+        <p style="color:#64748b;font-size:13px">Or copy this link:<br/><span style="word-break:break-all">${inviteUrl}</span></p>
+        <p style="color:#64748b;font-size:12px">Sign in with the same Google account as this email. Link expires in 7 days.</p>
+      </div>`,
+    });
+    if (error) {
+      console.log(JSON.stringify(error));
+      this.logger.error(`Invite email failed: ${error}`);
       return false;
     }
-    try {
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: Number(process.env.SMTP_PORT) || 587,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'FinTrack <noreply@fintrack.app>',
-        to,
-        subject: `You're invited to shared wallet: ${sanitizeHtml(walletName)}`,
-        html: `<div style="font-family:system-ui,sans-serif;padding:24px;max-width:560px">
-          <h2 style="margin:0 0 12px">Shared wallet invite</h2>
-          <p>You've been invited to <strong>${sanitizeHtml(walletName)}</strong> on FinTrack.</p>
-          <p><a href="${inviteUrl}" style="display:inline-block;padding:12px 20px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Accept invite</a></p>
-          <p style="color:#64748b;font-size:13px">Or copy this link:<br/><span style="word-break:break-all">${inviteUrl}</span></p>
-          <p style="color:#64748b;font-size:12px">Sign in with the same Google account as this email. Link expires in 7 days.</p>
-        </div>`,
-      });
-      return true;
-    } catch (e) {
-      this.logger.error(`Invite email failed: ${e}`);
-      return false;
-    }
+    return true;
   }
 
   async createWallet(userId: string, dto: CreateSharedWalletDto) {
